@@ -1,16 +1,24 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
-import App from "./App";
 import Game from "./Components/Game";
 import Player from "./Components/Player";
+import Menu from "./Components/Menu";
+import Score from "./Components/Score";
+import StoreProvider from "./Context";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
-    <Game />
-    <Player />
-  </React.StrictMode>
+  <StoreProvider
+    props={
+      <React.StrictMode>
+        <Menu />
+        <Game />
+        <Score />
+        <Player />
+      </React.StrictMode>
+    }
+  />
 );
 
 // If you want to start measuring performance in your app, pass a function

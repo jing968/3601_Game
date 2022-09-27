@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import useKeyPress from "../Hooks/useKeyPress";
 import styled from "styled-components";
+import { GlobalVars } from "../Context";
 
 const GameContainer = styled.div`
   position: absolute;
@@ -13,7 +14,7 @@ const GameContainer = styled.div`
 
 const GameBorder = styled.div`
   postion: absolute;
-  background-color: yellow;
+  background-color: black;
   width: 2.5%;
   height: 100%;
 `;
@@ -35,6 +36,8 @@ const BackGround = styled.div`
 const Game = ({}) => {
   const maxWidth = 120;
   const minWidth = 40;
+  const context = useContext(GlobalVars);
+  const [gameOver, setGameOver] = context.gameOver;
   const [gapWidth, setGapWidth] = useState(50);
   const [gapLocation, setGapLocation] = useState(50);
 
@@ -66,7 +69,14 @@ const Game = ({}) => {
     });
   };
 
+  // Handler for menu trigger
+  const testGameOver = () => {
+    setGameOver(true);
+  };
+
   const handleMove = useKeyPress("ArrowRight", doMove);
+
+  const handleGameOver = useKeyPress("ArrowUp", testGameOver);
 
   const Gap = styled.div`
     position: relative;
@@ -79,6 +89,7 @@ const Game = ({}) => {
   return (
     <GameContainer>
       {handleMove}
+      {handleGameOver}
       <GameBorder />
       <GameArea>
         <BackGround>
