@@ -2,6 +2,16 @@ import React, { useState, useEffect } from "react";
 import useKeyPress from "../Hooks/useKeyPress";
 import styled from "styled-components";
 
+const PlayerUI = styled.div`
+  position: relative;
+  left: 20%;
+  border-radius: 50%;
+  height: 40px;
+  width: 40px;
+  background-color: red;
+  z-index: 5;
+`;
+
 const Player = ({}) => {
   const [jumping, setJumping] = useState(false);
   const [offset, setOffset] = useState(0);
@@ -40,18 +50,9 @@ const Player = ({}) => {
 
   const handleJump = useKeyPress(" ", doJump);
 
-  const PlayerUI = styled.div`
-    position: relative;
-    top: ${56 - offset}vh;
-    left: 20%;
-    border-radius: 50%;
-    height: 40px;
-    width: 40px;
-    background-color: red;
-    z-index: 5;
-  `;
   return (
     <PlayerUI
+      style={{ top: `${56 - offset}vh` }}
       onClick={() => {
         function test() {
           console.log("6 seconds later");

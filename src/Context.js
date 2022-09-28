@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export const GlobalVars = React.createContext(null);
+export const GlobalVars = React.createContext([{}, () => {}]);
 
 const StoreProvider = ({ props }) => {
   const [gameOver, setGameOver] = useState(false);
