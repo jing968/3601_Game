@@ -33,19 +33,11 @@ const BackGround = styled.div`
   background-color: black;
 `;
 
-const Gap = styled.div`
-  position: relative;
-  height: 40vh;
-  background-color: white;
-  z-index: 2;
-`;
-
 const Game = ({}) => {
   const maxWidth = 120;
   const minWidth = 40;
   const context = useContext(GlobalVars);
   const [gameOver, setGameOver] = context.gameOver;
-  const [score, setScore] = context.score;
   const [gapWidth, setGapWidth] = useState(50);
   const [gapLocation, setGapLocation] = useState(50);
 
@@ -69,34 +61,31 @@ const Game = ({}) => {
     }
   }, [gapLocation]);
 
-  const incrementScore = () => {
-    setScore((intial) => {
-      return intial + 1;
-    });
-  };
-
   // Handler for useKeyPress hook
   const doMove = () => {
-    console.log(gameOver);
     setGapLocation((intial) => {
-      incrementScore();
-      if (intial === 40) setGameOver(true);
+      // Getting
       return intial - 1;
     });
   };
 
   // Handler for menu trigger
   const testGameOver = () => {
-    setGameOver((prev) => {
-      return !prev;
-    });
+    setGameOver(true);
   };
 
   const handleMove = useKeyPress("ArrowRight", doMove);
 
-  // Debug function REMOVE LATER
   const handleGameOver = useKeyPress("ArrowUp", testGameOver);
 
+  const Gap = styled.div`
+    position: relative;
+    width: ${gapWidth}px;
+    height: 40vh;
+    left: ${gapLocation}%;
+    background-color: white;
+    z-index: 2;
+  `;
   return (
     <GameContainer>
       {handleMove}
@@ -104,12 +93,7 @@ const Game = ({}) => {
       <GameBorder />
       <GameArea>
         <BackGround>
-          <Gap
-            style={{
-              width: `${gapWidth}px`,
-              left: `${gapLocation}%`,
-            }}
-          ></Gap>
+          <Gap></Gap>
         </BackGround>
       </GameArea>
       <GameBorder />
