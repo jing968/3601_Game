@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import useKeyPress from "../Hooks/useKeyPress";
-import styled from "styled-components";
+import styled, { keyframes } from "styled-components";
 import { GlobalVars } from "../Context";
 
 const GameContainer = styled.div`
@@ -9,7 +9,24 @@ const GameContainer = styled.div`
   flex-direction: row;
   width: 100%;
   height: 100%;
-  background-color: white;
+`;
+
+const fadeIn = keyframes`
+  0%   {width: 0px; height: 0px; opacity: 1; display: flex;}
+  100% {width: 200px; height: 200px; opacity: 0; display: none}
+`;
+
+const StartPrompt = styled.img`
+  z-index: 20;
+  opacity: 0;
+  position: absolute;
+  margin: auto;
+  width: 200px;
+  height: 200px;
+  top: 30%;
+  left: 50%;
+  translate: -50%;
+  animation: ${fadeIn} 2s linear;
 `;
 
 const GameBorder = styled.div`
@@ -22,7 +39,7 @@ const GameBorder = styled.div`
 const GameArea = styled.div`
   width: 95%;
   height: 100%;
-  background-color: transparent;
+  background-color: paleturquoise;
 `;
 
 const BackGround = styled.div`
@@ -33,41 +50,78 @@ const BackGround = styled.div`
   background-color: black;
 `;
 
+const floating1 = keyframes`
+  0%   {left: 20%;}
+  50%  {left: 35%}
+  100% {left: 20%;}
+`;
+
+const floating2 = keyframes`
+  0%   {left: 40%;}
+  25%  {left: 25%;}
+  50%  {left: 40%;}
+  75%  {left: 55%;}
+  100%  {left: 40%;}
+`;
+
+const Cloud1 = styled.img`
+  position: absolute;
+  top: 10%;
+  width: 200px;
+  height: 80px;
+  animation: ${floating1} 6s linear infinite;
+`;
+
+const Cloud2 = styled.img`
+  position: absolute;
+  top: 18%;
+  width: 200px;
+  height: 80px;
+  animation: ${floating2} 6s linear infinite;
+`;
+
 const Gap = styled.div`
   position: relative;
   height: 40vh;
-  background-color: white;
+  background-color: paleturquoise;
   z-index: 2;
 `;
+var scoreLock = false;
 
 const Game = ({}) => {
-  const maxWidth = 120;
+  const maxWidth = 120 * 3;
   const minWidth = 40;
   const context = useContext(GlobalVars);
   const [gameOver, setGameOver] = context.gameOver;
   const [score, setScore] = context.score;
-  const [gapWidth, setGapWidth] = useState(50);
+  const [gOffsetX, setGOffsetX] = context.gOffsetX;
+  const [gapWidth, setGapWidth] = context.gapWidth;
+  const [offset, setOffset] = context.offset;
   const [gapLocation, setGapLocation] = useState(50);
 
   // Check if "gap" is off-screan
   // meaning we need to create a new gap
   useEffect(() => {
-    if (gapLocation === 0) {
-      setGapWidth(() => {
-        // Randomised gapWidth
-        const newWidth = Math.random() * (maxWidth - minWidth) + minWidth;
-
-        // Calc new gap location according to newWidth to fit in screen size
-        //const newGapLocation = `98% - ${newWidth}px`;
-
-        // Set new gap location
-        setGapLocation(90);
-
-        // Set new gap width
-        return newWidth;
+    let boxX = window.innerWidth * 0.8 - 20;
+    if (offset <= 0 && boxX < gOffsetX && boxX > gOffsetX - gapWidth) {
+      setGameOver((prev) => {
+        return !prev;
       });
+      return;
     }
-  }, [gapLocation]);
+
+    if (gOffsetX / (window.innerWidth + gapWidth) + 0.2 > 1 && !scoreLock) {
+      // debugger
+      incrementScore();
+      scoreLock = true;
+    } else if (gOffsetX - gapWidth > window.innerWidth && scoreLock) {
+      scoreLock = false;
+      let _gw = minWidth + Math.random() * maxWidth;
+      console.log("重置");
+      setGapWidth(_gw);
+      setGOffsetX(0);
+    }
+  }, [gOffsetX, gapWidth, offset]);
 
   const incrementScore = () => {
     setScore((intial) => {
@@ -79,8 +133,8 @@ const Game = ({}) => {
   const doMove = () => {
     console.log(gameOver);
     setGapLocation((intial) => {
-      incrementScore();
-      if (intial === 40) setGameOver(true);
+      // incrementScore();
+      // if (intial === 40) setGameOver(true);
       return intial - 1;
     });
   };
@@ -92,22 +146,25 @@ const Game = ({}) => {
     });
   };
 
-  const handleMove = useKeyPress("ArrowRight", doMove);
+  // const handleMove = useKeyPress("ArrowRight", doMove);
 
   // Debug function REMOVE LATER
-  const handleGameOver = useKeyPress("ArrowUp", testGameOver);
+  // const handleGameOver = useKeyPress("ArrowUp", testGameOver);
 
   return (
     <GameContainer>
-      {handleMove}
-      {handleGameOver}
+      {/* {handleMove} */}
+      {/* {handleGameOver} */}
       <GameBorder />
       <GameArea>
+        <Cloud1 src={require("../Assets/cloud.png")} />
+        <Cloud2 src={require("../Assets/cloud.png")} />
+        <StartPrompt src={require("./../Assets/gameover.png")} />
         <BackGround>
           <Gap
             style={{
               width: `${gapWidth}px`,
-              left: `${gapLocation}%`,
+              left: `${window.innerWidth - gOffsetX}px`,
             }}
           ></Gap>
         </BackGround>

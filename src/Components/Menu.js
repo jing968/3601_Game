@@ -17,6 +17,13 @@ const MenuWrapper = styled.div`
   z-index: 10;
 `;
 
+const Poro = styled.img`
+  display: flex;
+  align-self: center;
+  width: 120px;
+  height: 120px;
+`;
+
 const MenuTitle = styled.div`
   position: relative;
   display: flex;
@@ -43,17 +50,22 @@ const Menu = ({}) => {
   const context = useContext(GlobalVars);
   const [score, setScore] = context.score;
   const [gameOver, setGameOver] = context.gameOver;
+  const [gOffsetX, setGOffsetX] = context.gOffsetX;
+  const [gapWidth, setGapWidth] = context.gapWidth;
 
   const VisibleMenu = () => {
     const handleRestart = () => {
       setGameOver((initial) => {
         return !initial;
       });
-      setScore(-1);
+      setScore(0);
+      setGapWidth(50);
+      setGOffsetX(window.innerWidth / 2);
     };
 
     return (
       <MenuWrapper>
+        <Poro src={require("./../Assets/gameover.png")} />
         <MenuTitle>You Lost! Your score: {score}</MenuTitle>
         <MenuButton onClick={handleRestart}>Restart</MenuButton>
       </MenuWrapper>
