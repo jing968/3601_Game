@@ -3,6 +3,7 @@ import useKeyPress from "../Hooks/useKeyPress";
 import styled from "styled-components";
 import { keyboard } from "@testing-library/user-event/dist/keyboard";
 import { GlobalVars } from "../Context";
+import data from "../Assets/data.txt";
 
 const PlayerObj = styled.div`
   position: relative;
@@ -38,6 +39,118 @@ const Player = ({}) => {
 
   // Listener for jumping triggers
   useEffect(() => {}, [jumping, gapWidth]);
+
+  // Grap inputs from data.txt
+  useEffect(() => {
+    fetch(data)
+      .then((r) => r.text())
+      .then((text) => {
+        const powerArr = [];
+
+        const calcMax = (arr) => {
+          var max = arr[0];
+          for (var i = 1; i < arr.length; i++) {
+            if (arr[i] > max) max = arr[i];
+          }
+          return max;
+        };
+
+        const filterData = (entries) => {
+          const entrySizePerSecond = 256000;
+          var arr = [];
+          // Loop through all entries
+          for (var i = 0; i < entries.length; i++) {
+            // Write entry into temp arr
+            arr.push(entries[i]);
+            // If accumlated all entries for a given second
+            // Or
+            // Reach the last entry in the wav file
+            if (arr.length === entrySizePerSecond || i === entries.length - 1) {
+              // Cal max volume for the given second
+              const max = calcMax(arr);
+              // Store max volume
+              powerArr.push(max);
+              // Wipe arr for a new second
+              arr = [];
+            }
+          }
+        };
+
+        const concatText = (arr) => {
+          const res = [];
+          var i = 0;
+          var j = 0;
+          while (j < arr.length) {
+            // Keep track of digits
+            var temp = 0;
+            // Loop till new line char
+            while (arr[j] !== "\n") {
+              j++;
+              temp++;
+            }
+            // Rebuild numbers from string
+            var num = 0;
+            while (i !== j) {
+              const tens = temp * 10;
+              num += tens * parseInt(arr[i]);
+              i++;
+            }
+            res.push(num);
+            i++;
+            j++;
+          }
+          return res;
+        };
+
+        const scaleData = (arr) => {
+          const min = 0;
+          const max = 360;
+          return arr.map((elem) => {
+            const percentage = elem / max;
+            return percentage * MaxPower;
+          });
+        };
+
+        const triggerJump = (p) => {
+          Power = p;
+          // Set Power
+          setPHeight(26 + ~~(14 * (1 - Power / MaxPower)).toFixed(0));
+          // Trigger Jump
+          if (PlayerState == 2) {
+            return;
+          }
+          console.log(`蓄力结束 当前能量:${Power}`);
+          PowerTimestamp = 0;
+          PlayerState = 1;
+          setPHeight(40);
+          // if (!jumping) setJumping(true);
+          invokeAnimation();
+        };
+
+        // data manipulation -> filter new lines
+        const res = concatText(text);
+        console.log(res);
+
+        // Filtering data
+        filterData(res);
+
+        // Scale Data
+        const finalInput = scaleData(powerArr);
+
+        // Triggering Jump from finalised data
+        const delays = 3000; // 2 seconds
+        var curDelay = 0;
+        finalInput.forEach((p) => {
+          console.log(`Delay: ${curDelay}------- Power: ${p}-------------`);
+          setTimeout(() => {
+            triggerJump(p);
+          }, curDelay);
+          curDelay += delays;
+        });
+      });
+  }, []);
+
+  // Jump triggering function
 
   // Handler for useKeyPress hook
   const doJump = (r) => {
@@ -155,7 +268,19 @@ const Player = ({}) => {
       }}
       onClick={() => {
         function test() {
-          console.log("6 seconds later");
+          Power = 6000;
+          // Set Power
+          setPHeight(26 + ~~(14 * (1 - Power / MaxPower)).toFixed(0));
+          // Trigger Jump
+          if (PlayerState == 2) {
+            return;
+          }
+          console.log(`蓄力结束 当前能量:${Power}`);
+          PowerTimestamp = 0;
+          PlayerState = 1;
+          setPHeight(40);
+          // if (!jumping) setJumping(true);
+          invokeAnimation();
         }
         setTimeout(test, 1000);
       }}

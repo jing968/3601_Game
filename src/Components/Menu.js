@@ -2,6 +2,14 @@ import React, { useContext } from "react";
 import { GlobalVars } from "../Context";
 import styled from "styled-components";
 
+const ParentWrapper = styled.div`
+  display: flex;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: paleturquoise;
+`;
+
 const MenuWrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -13,7 +21,7 @@ const MenuWrapper = styled.div`
   transform: translate(-50%, -50%);
   height: 300px;
   width: 250px;
-  border: 2px solid black;
+  border: 3px solid black;
   z-index: 10;
 `;
 
@@ -29,6 +37,7 @@ const MenuTitle = styled.div`
   display: flex;
   margin: auto;
   color: black;
+  font-weight: bold;
 `;
 
 const MenuButton = styled.div`
@@ -64,11 +73,13 @@ const Menu = ({}) => {
     };
 
     return (
-      <MenuWrapper>
-        <Poro src={require("./../Assets/gameover.png")} />
-        <MenuTitle>You Lost! Your score: {score}</MenuTitle>
-        <MenuButton onClick={handleRestart}>Restart</MenuButton>
-      </MenuWrapper>
+      <ParentWrapper>
+        <MenuWrapper>
+          <Poro src={require("./../Assets/gameover.png")} />
+          <MenuTitle>You Lost! Your score: {score}</MenuTitle>
+          <MenuButton onClick={handleRestart}>Restart</MenuButton>
+        </MenuWrapper>
+      </ParentWrapper>
     );
   };
 
